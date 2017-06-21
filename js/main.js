@@ -3,7 +3,7 @@ var app = {
         var self = this;
         this.detailsURL = /^#employees\/(\d{1,})/;        
         this.store = new WebSqlStore(function() {
-            $('body').html(new HomeView(self.store).render().el);
+            //$('body').html(new HomeView(self.store).render().el);
             self.route();
             //self.showAlert('Welcome to the Store', 'Info');
         });
@@ -28,21 +28,21 @@ var app = {
     },
 
     route: function() {
+        var self = this;
         var hash = window.location.hash;
         if (!hash) {
-            if (this.homePage) {
-                this.slidePage(this.homePage);
-            } else {
-                this.homePage = new HomeView(this.store).render();
-                this.slidePage(this.homePage);
-            }
-            $('body').html(new HomeView(this.store).render().el);
+            var append = !this.homePage
+            this.homePage = this.homePage || new HomeView(this.store).render();
+            //this.homePage = new HomeView(this.store).render();
+            //$('body').html(new HomeView(this.store).render().el);
+            this.slidePage(this.homePage,append);
             return;
         }
         var match = hash.match(app.detailsURL);
         if (match) {
             this.store.findById(Number(match[1]), function(employee) {
-                $('body').html(new EmployeeView(employee).render().el);
+                //$('body').html(new EmployeeView(employee).render().el);
+                self.slidePage(new EmployeeView(employee).render(),true);
             });
         }
     },
@@ -55,7 +55,7 @@ var app = {
         }
     },
 
-    slidePage: function(page) {
+    slidePage: function(page,append) {
         var currentPageDest,
             self = this;
     
@@ -68,19 +68,16 @@ var app = {
         }
     
         // Cleaning up: remove old pages that were moved out of the viewport
-        $('.stage-right, .stage-left').not('.homePage').remove();
-
-        if (page === app.homePage) {
-            // Always apply a Back transition (slide from left) when we go back to the search page
-            $(page.el).attr('class', 'page stage-left');
-            currentPageDest = "stage-right";
-        } else {
-            // Forward transition (slide from right)
-            $(page.el).attr('class', 'page stage-right');
-            currentPageDest = "stage-left";
-        }
-    
-        $('body').append(page.el);
+        //$('.stage-right, .stage-left').not('.homePage').remove();
+        $('.stage-right').not('.homePage').remove();
+        
+        // Always apply a Back transition (slide from left) when we go back to the search page
+        // Forward transition (slide from right)
+        $(page.el).attr('class', page === app.homePage ? 'page stage-left' : 'page stage-right');
+        currentPageDest = page === app.homePage ? "stage-right" : "stage-left";
+        
+        if(append)
+            $('body').append(page.el);
     
         // Wait until the new page has been added to the DOM...
         setTimeout(function() {
