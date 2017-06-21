@@ -15,9 +15,7 @@ var EmployeeView = function(employee) {
     this.render = function() {
         this.el.html(EmployeeView.template(employee));
         return this;
-    };
-
-    
+    };   
 
     this.addLocation = function(event) {
         event.preventDefault();
