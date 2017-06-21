@@ -76,6 +76,7 @@ var WebSqlStore = function(successCallback, errorCallback) {
     }
 
     this.findByName = function(searchKey, callback) {
+        searchKey = searchKey ||"";
         this.db.transaction(
             function(tx) {
 
